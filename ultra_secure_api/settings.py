@@ -194,8 +194,9 @@ AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
 
 # Only public read for now
 AWS_QUERYSTRING_AUTH = False
-AWS_S3_FILE_OVERWRITE = True
+AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL='public-read'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
 
 STORAGES = {
     "default": {
@@ -205,4 +206,5 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-STATICFILES_STORAGE = "storages.backends.s3.S3Storage"
+
+DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"

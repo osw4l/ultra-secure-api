@@ -141,11 +141,6 @@ spec:
                 secretKeyRef:
                   name: ultra-secure-api-monolith-secrets
                   key: AWS_S3_REGION_NAME
-            - name: AWS_S3_ENDPOINT_URL
-              valueFrom:
-                secretKeyRef:
-                  name: ultra-secure-api-monolith-secrets
-                  key: AWS_S3_ENDPOINT_URL
 
 
 ---
