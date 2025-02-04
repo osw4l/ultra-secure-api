@@ -86,7 +86,7 @@ jobs:
 
       - name: Build and Push Docker image
         run: |
-          IMAGE_URI="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}:latest"
+          IMAGE_URI="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}-monolith:latest"
           docker build -t "$IMAGE_URI" .
           docker push "$IMAGE_URI"
 
