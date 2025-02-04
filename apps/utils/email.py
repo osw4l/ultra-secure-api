@@ -4,7 +4,7 @@ import asyncio
 import json
 
 
-async def send_email(email: str, subject: str, content: str):
+def send_email(email: str, subject: str, content: str):
     url = "https://api.sendgrid.com/v3/mail/send"
 
     headers = {
@@ -24,9 +24,9 @@ async def send_email(email: str, subject: str, content: str):
         }]
     }
 
-    async with httpx.AsyncClient() as client:
+    with httpx.Client() as client:
         try:
-            response = await client.post(url, headers=headers, json=payload)
+            response = client.post(url, headers=headers, json=payload)
             response.raise_for_status()
             print("Status Code:", response.status_code)
             print("Response Body:", response.text)

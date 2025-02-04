@@ -141,6 +141,16 @@ spec:
                 secretKeyRef:
                   name: ultra-secure-api-monolith-secrets
                   key: AWS_S3_REGION_NAME
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: SENDGRID_API_KEY
+            - name: SENDGRID_EMAIL_SENDER
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: SENDGRID_EMAIL_SENDER
 
 
 ---

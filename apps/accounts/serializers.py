@@ -55,12 +55,7 @@ class AccountCodeValidatorSerializer(serializers.Serializer):
     code = serializers.CharField(min_length=4, max_length=4)
 
 
-class AccountResetPasswordSerializer(serializers.Serializer):
-    email = serializers.EmailField(
-        required=True,
-    )
-    code = serializers.CharField(min_length=4, max_length=4)
-    password1 = serializers.CharField(min_length=4, max_length=4)
-    password2 = serializers.CharField(min_length=4, max_length=4)
+class AccountSetNewPasswordSerializer(AccountCodeValidatorSerializer):
+    password = serializers.CharField(min_length=6)
 
 

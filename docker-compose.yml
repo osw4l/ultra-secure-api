@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   api:
-    container_name: minjot_api
+    container_name: ultra_secure_api
     depends_on:
       database:
         condition: service_healthy

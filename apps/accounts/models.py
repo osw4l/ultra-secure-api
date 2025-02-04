@@ -10,6 +10,7 @@ from django.utils import timezone
 from datetime import timedelta, datetime
 from django.db import models, transaction
 from django_lifecycle import LifecycleModel, BEFORE_CREATE, hook, AFTER_CREATE
+from rest_framework.exceptions import ValidationError
 
 from .managers import UserManager
 from apps.utils.email import send_email
@@ -44,12 +45,13 @@ class Account(AbstractUser):
         if hasattr(self, 'recovery_pin') and self.recovery_pin:
             now = datetime.now(dt_tz.utc)
             if now < self.recovery_pin.expiration_date:
-                raise ValueError("A new code cannot be generated. Please wait 10 minutes before requesting a new code.")
+                # raise ValidationError("A new code cannot be generated. Please wait 10 minutes before requesting a new code.")
+                print('generating new code')
             self.recovery_pin.delete()
 
         return RecoveryPin.objects.create(
             code=code,
-            account=self
+            user=self
         )
 
     def set_new_password(self, password):
@@ -91,7 +93,6 @@ class RecoveryPin(LifecycleModel):
         context = {
             'first_name': self.user.first_name,
             'code': self.code,
-            'verification_url': 'https://your-verification-url.com'
         }
 
         html_content = render_to_string('code_email.html', context)

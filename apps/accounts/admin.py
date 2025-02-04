@@ -4,7 +4,7 @@ from django import forms
 from django.contrib import admin
 
 from .forms import AccountAdminForm
-from .models import Account
+from .models import Account, RecoveryPin
 from django.contrib import messages
 
 from apps.credentials.models import UserCategory
@@ -72,6 +72,18 @@ class AccountAdmin(admin.ModelAdmin):
 
     generate_recovery_code.short_description = 'Generate Recovery Code for selected accounts'
 
+
+@admin.register(RecoveryPin)
+class RecoveryPinAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'user',
+        'code',
+        'expiration_date'
+    ]
+    list_filter = [
+        'user'
+    ]
 
 
 pod_name = f'POD: {os.getenv("HOSTNAME", "Unknown-Pod")}'
