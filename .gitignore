@@ -1,0 +1,10 @@
+.idea
+.env
+__pycache__
+/docker_data
+/media/
+.vscode
+/static/
+/venv
+.devcontainer
+setup/docker/redis-data/dump.rdb

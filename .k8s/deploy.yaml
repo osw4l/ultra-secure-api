@@ -1,0 +1,183 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: ultra-secure-production
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: ultra-secure
+  namespace: ultra-secure-production
+spec:
+  domains:
+    - api.osw4l.com
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: ultra-secure
+  namespace: ultra-secure-production
+spec:
+  redirectToHttps:
+    enabled: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: ultra-secure-production
+  annotations:
+    kubernetes.io/ingress.className: "gce"
+    kubernetes.io/ingress.global-static-ip-name: ultra-secure-gke-ip
+    networking.gke.io/managed-certificates: ultra-secure
+    networking.gke.io/v1beta1.FrontendConfig: ultra-secure
+  name: ultra-secure
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /ultra-secure
+            pathType: Prefix
+            backend:
+              service:
+                name: ultra-secure
+                port:
+                  number: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ultra-secure-production
+  name: ultra-secure
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ultra-secure
+  template:
+    metadata:
+      namespace: ultra-secure-production
+      labels:
+        app: ultra-secure
+    spec:
+      containers:
+        - image: europe-central2-docker.pkg.dev/osw4l-platforms/ultra-secure/ultra-secure-monolith:latest
+          name: ultra-secure
+          ports:
+            - containerPort: 9090
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: "250m"
+              ephemeral-storage: 1Gi
+            limits:
+              memory: 512Mi
+              cpu: "500m"
+              ephemeral-storage: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /ultra-secure/
+              port: 9090
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /ultra-secure/
+              port: 9090
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          env:
+            - name: PG_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: PG_HOST
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: POSTGRES_PASSWORD
+            - name: PG_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: PG_PORT
+            - name: DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: DEBUG
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: DJANGO_SECRET_KEY
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_STORAGE_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: AWS_STORAGE_BUCKET_NAME
+            - name: AWS_S3_REGION_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: AWS_S3_REGION_NAME
+            - name: AWS_S3_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ultra-secure-api-monolith-secrets
+                  key: AWS_S3_ENDPOINT_URL
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ultra-secure
+  namespace: ultra-secure-production
+spec:
+  ports:
+    - port: 80
+      targetPort: 9090
+  selector:
+    app: ultra-secure
+  type: NodePort
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ultra-secure
+  namespace: ultra-secure-production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ultra-secure
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
