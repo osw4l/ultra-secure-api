@@ -1,3 +1,5 @@
+import os
+
 from django import forms
 from django.contrib import admin
 
@@ -71,6 +73,9 @@ class AccountAdmin(admin.ModelAdmin):
     generate_recovery_code.short_description = 'Generate Recovery Code for selected accounts'
 
 
-admin.site.site_header = 'Ultra Secure Admin'
-admin.site.site_title = 'Ultra Secure Admin'
-admin.site.index_title = 'Ultra Secure'
+
+pod_name = f'POD: {os.getenv("HOSTNAME", "Unknown-Pod")}'
+
+admin.site.site_header = f"Ultra Secure Admin - {pod_name}"
+admin.site.site_title = f"Ultra Secure Admin - {pod_name}"
+admin.site.index_title = f"Ultra Secure Dashboard - {pod_name}"
