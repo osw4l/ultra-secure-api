@@ -161,9 +161,6 @@ REST_FRAMEWORK = {
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/ultra-secure/static/'
 
-MEDIA_URL = '/ultra-secure/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT', 'Bearer'),
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=12),
@@ -195,16 +192,16 @@ AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
 # Only public read for now
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL='public-read'
+AWS_DEFAULT_ACL = False
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
-DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
